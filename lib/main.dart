@@ -1,111 +1,247 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    title: 'Simple Interest Calculator',
+    home: SIForm(),
+    theme: ThemeData(
+        brightness: Brightness.dark,
+        primaryColor: Colors.blue,
+        accentColor: Colors.blueAccent),
+  ));
+}
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class SIForm extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+  State<StatefulWidget> createState() {
+    return _SIFormState();
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class _SIFormState extends State<SIForm> {
+  var _formKey = GlobalKey<FormState>();
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
+  var _currencies = ['Shillings', 'Dollars', 'Euro', 'Pounds', 'Yen'];
+  final _minimumPadding = 5.0;
 
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+  var _currentItemSelected = '';
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
+  void initState() {
+    super.initState();
+    _currentItemSelected = _currencies[0];
+  }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  //Extracting text from the textFields
+  TextEditingController principalController = TextEditingController();
+  TextEditingController interestRateController = TextEditingController();
+  TextEditingController periodController = TextEditingController();
 
-  void _incrementCounter() {
+  var displayResultOfSI = '';
+
+  @override
+  Widget build(BuildContext context) {
+    TextStyle textStyle = Theme.of(context).textTheme.title;
+
+    return Scaffold(
+      resizeToAvoidBottomPadding: false,
+      appBar: AppBar(
+        title: Text("Simple Interest Calculator"),
+      ),
+      body: Form(
+        key: _formKey,
+        child: Padding(
+            padding: EdgeInsets.all(_minimumPadding * 2),
+            child: ListView(
+              children: <Widget>[
+                getImageAsset(),
+                Padding(
+                    padding: EdgeInsets.only(
+                        top: _minimumPadding, bottom: _minimumPadding),
+                    child: TextFormField(
+                      keyboardType: TextInputType.number,
+                      style: textStyle,
+                      controller: principalController,
+                      validator: (String value) {
+                        //Validation logic
+                        if (value.isEmpty) {
+                          return "Please input the principal amount";
+                        }
+                      },
+                      decoration: InputDecoration(
+                          labelText: "Principal",
+                          hintText: "Enter Principal i.e. 123456",
+                          labelStyle: textStyle,
+                          errorStyle: TextStyle(
+                              //color: Colors.yellowAccent,
+                              fontSize: 18.0
+                          ),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(5.0))),
+                    )),
+                Padding(
+                    padding: EdgeInsets.only(
+                        top: _minimumPadding, bottom: _minimumPadding),
+                    child: TextFormField(
+                      keyboardType: TextInputType.number,
+                      style: textStyle,
+                      controller: interestRateController,
+                      validator: (String value) {
+                        //Validation logic
+                        if (value.isEmpty) {
+                          return "You must enter your interest rate.";
+                        }
+                      },
+                      decoration: InputDecoration(
+                          labelText: "Interest rate",
+                          hintText: "Enter Percentage rate i.e. 16",
+                          labelStyle: textStyle,
+                          errorStyle: TextStyle(
+                            //color: Colors.yellowAccent,
+                              fontSize: 18.0
+                          ),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(5.0))),
+                    )),
+                Padding(
+                    padding: EdgeInsets.only(
+                        top: _minimumPadding, bottom: _minimumPadding),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                            child: TextFormField(
+                          keyboardType: TextInputType.number,
+                          style: textStyle,
+                          controller: periodController,
+                              validator: (String value) {
+                                //Validation logic
+                                if (value.isEmpty) {
+                                  return "Please input the period";
+                                }
+                              },
+                          decoration: InputDecoration(
+                              labelText: "Period",
+                              hintText: "Time in years.",
+                              labelStyle: textStyle,
+                              errorStyle: TextStyle(
+                                //color: Colors.yellowAccent,
+                                  fontSize: 18.0
+                              ),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(5.0))),
+                        )),
+                        Container(
+                          width: _minimumPadding * 5,
+                        ),
+                        Expanded(
+                            child: DropdownButton<String>(
+                          items: _currencies.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          value: _currentItemSelected,
+                          onChanged: (String newValueSelected) {
+                            _onDropdownItemSelected(newValueSelected);
+                          },
+                        ))
+                      ],
+                    )),
+                Padding(
+                    padding: EdgeInsets.only(
+                        top: _minimumPadding, bottom: _minimumPadding),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                            child: RaisedButton(
+                          color: Theme.of(context).accentColor,
+                          textColor: Theme.of(context).primaryColorDark,
+                          child: Text(
+                            "Calculate",
+                            textScaleFactor: 1.5,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              if (_formKey.currentState.validate()) {
+                                this.displayResultOfSI =
+                                    _calculateTotalInterest();
+                              }
+                            });
+                          },
+                        )),
+                        Expanded(
+                            child: RaisedButton(
+                          color: Theme.of(context).primaryColorDark,
+                          textColor: Theme.of(context).primaryColorLight,
+                          child: Text(
+                            "Reset",
+                            textScaleFactor: 1.5,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _resetValues();
+                            });
+                          },
+                        )),
+                      ],
+                    )),
+                Padding(
+                  padding: EdgeInsets.only(
+                      top: _minimumPadding, bottom: _minimumPadding),
+                  child: Text(
+                    this.displayResultOfSI,
+                    style: textStyle,
+                  ),
+                )
+              ],
+            )),
+      ),
+    );
+  }
+
+  Widget getImageAsset() {
+    AssetImage assetImage = AssetImage('images/cash.png');
+    Image image = Image(
+      image: assetImage,
+      width: 150.0,
+      height: 150.0,
+    );
+
+    return Container(
+      child: image,
+      margin: EdgeInsets.all(_minimumPadding * 10),
+    );
+  }
+
+  void _onDropdownItemSelected(String newValueSelected) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      this._currentItemSelected = newValueSelected;
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+  String _calculateTotalInterest() {
+    //Convert all strings to double
+    double principal = double.parse(principalController.text);
+    double interestRate = double.parse(interestRateController.text);
+    double _period = double.parse(periodController.text);
+
+    //Calculate SI now
+    double totalAmountPayable =
+        principal + (principal * interestRate * _period) / 100;
+
+    String result = "You are investing an amount of $principal for $_period "
+        "years. \nEventually your investment  then will be: \n"
+        "     $totalAmountPayable $_currentItemSelected";
+    return result;
+  }
+
+  void _resetValues() {
+    principalController.text = '';
+    interestRateController.text = '';
+    periodController.text = '';
+    displayResultOfSI = '';
+    _currentItemSelected = _currencies[0];
   }
 }
