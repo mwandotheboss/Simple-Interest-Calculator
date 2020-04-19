@@ -63,6 +63,7 @@ class _SIFormState extends State<SIForm> {
                       keyboardType: TextInputType.number,
                       style: textStyle,
                       controller: principalController,
+                      // ignore: missing_return
                       validator: (String value) {
                         //Validation logic
                         if (value.isEmpty) {
@@ -73,10 +74,6 @@ class _SIFormState extends State<SIForm> {
                           labelText: "Principal",
                           hintText: "Enter Principal i.e. 123456",
                           labelStyle: textStyle,
-                          errorStyle: TextStyle(
-                              //color: Colors.yellowAccent,
-                              fontSize: 18.0
-                          ),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(5.0))),
                     )),
@@ -87,6 +84,7 @@ class _SIFormState extends State<SIForm> {
                       keyboardType: TextInputType.number,
                       style: textStyle,
                       controller: interestRateController,
+                      // ignore: missing_return
                       validator: (String value) {
                         //Validation logic
                         if (value.isEmpty) {
@@ -97,10 +95,6 @@ class _SIFormState extends State<SIForm> {
                           labelText: "Interest rate",
                           hintText: "Enter Percentage rate i.e. 16",
                           labelStyle: textStyle,
-                          errorStyle: TextStyle(
-                            //color: Colors.yellowAccent,
-                              fontSize: 18.0
-                          ),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(5.0))),
                     )),
@@ -114,20 +108,17 @@ class _SIFormState extends State<SIForm> {
                           keyboardType: TextInputType.number,
                           style: textStyle,
                           controller: periodController,
-                              validator: (String value) {
-                                //Validation logic
-                                if (value.isEmpty) {
-                                  return "Please input the period";
-                                }
-                              },
+                          // ignore: missing_return
+                          validator: (String value) {
+                            //Validation logic
+                            if (value.isEmpty) {
+                              return "Please input the period";
+                            }
+                          },
                           decoration: InputDecoration(
                               labelText: "Period",
                               hintText: "Time in years.",
                               labelStyle: textStyle,
-                              errorStyle: TextStyle(
-                                //color: Colors.yellowAccent,
-                                  fontSize: 18.0
-                              ),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(5.0))),
                         )),
